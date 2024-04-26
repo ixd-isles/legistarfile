@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Newark Legistar File Puller</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <style>
+ 	html, body, #map {
+        height: 100%;
+        padding: 20px;
+        margin: 0;
+      }
+
+	#grid {
+		width:100%;
+	}
+
+	td {
+		padding:5px;
+		border:solid 1px #aaa;
+	}
+	 
+	.spacer {
+		width:100%;
+		height:10px;
+	}
+ 
+	  #locate-position{
+ 	 position:absolute;
+	  top:140px;
+ 	 left:22px;
+ 	 -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+ 	 -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+ 	 box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+
+ 	 background-color:#ffffff;
+	  border: solid 1px #999999;
+	  border-radius: 3px;
+	  height: 28px;
+	 width:28px;
+	}
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://unpkg.com/wildcard-match@5.1.2/build/index.umd.js"></script>
+
+</head>
+
+<body>
+
+<script>
+
+var legiText;
+var listFile = '';
+var rawData;
+
+counter = 0;
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+var listFile = urlParams.get('legifile');
+console.log(listFile);
+
+
+const legiQuery = async() => {
+
+  var intcount = 0;
+
+
+//var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=MatterFile eq '" + listFile + "'");
+
+
+var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=MatterFile eq '" + listFile + "'");
+
+
+
+		const url = 'https://corsproxy.io/?' + legiCall;
+	
+		$.getJSON( url, function( json ) {
+				
+				console.log(json[0]);
+			
+				var matterID = json[0].MatterId;
+				//var guid = json[0].MatterGuid;
+			
+  				attachmentTree = "https://webapi.legistar.com/v1/newark/matters/" + matterID + 					"/Attachments";
+
+				const atturl = 'https://corsproxy.io/?' + attachmentTree;
+				$.getJSON(atturl, function (json) {
+
+					console.log(json[0]);
+					var pdflink = json[0].MatterAttachmentHyperlink;
+					legiText = pdflink;
+					console.log(legiText);
+					window.open(pdflink);
+				})
+		
+				
+			
+						
+		})
+		.fail(function () {
+			legiText = "No public file";
+			} )
+
+		.always(function() {
+			
+				console.log(legiText);	
+				
+			} );
+		;
+		
+
+	
+	}
+/*
+var file = "https://raw.githubusercontent.com/ixd-isles/legi/main/LegiTest.csv";
+Papa.parse(file, {download:true, 
+	complete: function(result) {
+	rawData = result.data;
+	legiQuery();
+}});
+*/
+
+	legiQuery();
+
+
+</script>
+<div class="spacer"></div>
+<table id="grid"></table>
+</body>
+</html>
