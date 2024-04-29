@@ -16,6 +16,7 @@
 	height: 100%;
 	}
 
+	#meh { width: 100%; display: 'none' }
 
     </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -28,6 +29,29 @@
 
 <script>
 
+
+function isSimilar(str1, str2) {
+  return str1.indexOf(str2.toLowerCase()) !== -1;
+}
+
+function findMatchingAttachment(recordtype, json) {
+  const searchPhrase = (recordtype === "TA") ? "Financial Agreement" : "Redevelopment Agreement";
+
+  for (let i = 0; i < json.length; i++) {
+    const attachmentName = json[i].MatterAttachmentName.toLowerCase(); // Ensure case-insensitive search
+
+    if (isSimilar(attachmentName, searchPhrase.toLowerCase())) {
+      return json[i].MatterAttachmentHyperlink;
+    }
+  }
+
+  // If no match is found, return a message indicating no match
+  return "";
+}
+
+
+
+
 var legiText;
 var listFile = '';
 var rawData;
@@ -37,19 +61,18 @@ counter = 0;
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 var listFile = urlParams.get('legifile');
-console.log(listFile);
+var recordType = urlParams.get('type');
+
+var codeword = "";
+
+console.log(listFile, recordType);
+
 
 
 const legiQuery = async() => {
 
-  var intcount = 0;
-
-
-//var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=MatterFile eq '" + listFile + "'");
-
 
 var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=MatterFile eq '" + listFile + "'");
-
 
 
 		const url = 'https://corsproxy.io/?' + legiCall;
@@ -60,18 +83,45 @@ var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=
 			
 				var matterID = json[0].MatterId;
 				//var guid = json[0].MatterGuid;
-			
+				console.log(matterID);
+
+				if (matterID) {
+		
   				attachmentTree = "https://webapi.legistar.com/v1/newark/matters/" + matterID + 					"/Attachments";
+				console.log("attachmenttree = ", attachmentTree);
 
 				const atturl = 'https://corsproxy.io/?' + attachmentTree;
+
+				
 				$.getJSON(atturl, function (json) {
 
-					//console.log(json[0]);
-					var pdflink = json[0].MatterAttachmentHyperlink;
-					legiText = pdflink;
-					//console.log(legiText);
-					document.getElementById("pdf").src = pdflink;
-				})
+					var len = json.length;
+					console.log(len);
+
+					var pdflink = findMatchingAttachment(recordType, json);
+					if (pdflink ==="") {
+						legiText = json[0].MatterAttachmentHyperlink;
+					}
+
+					else {
+						legiText = pdflink;
+					}
+					
+					console.log(legiText);
+					document.getElementById("pdf").src = legiText;
+					document.getElementById("meh").style.display = 'none';
+
+				});				
+
+				}
+				
+				else {
+					console.log("Womp womp!");
+				}
+					
+				
+					
+				
 		
 				
 			
@@ -90,7 +140,9 @@ var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=
 		
 
 	
-	}
+}
+
+
 /*
 var file = "https://raw.githubusercontent.com/ixd-isles/legi/main/LegiTest.csv";
 Papa.parse(file, {download:true, 
@@ -104,7 +156,7 @@ Papa.parse(file, {download:true,
 
 
 </script>
-
+<div id = "meh">Because Legistar's API is annoying, a direct link to this document is not available. However, you can still find the text and details of the legislation by going to <b><a href="https://newark.legistar.com/Legislation.aspx">newark.legistar.com/Legislation</a></b> and searching by the file number.</div>
 <embed id = 'pdf' src=""></embed>
 </body>
 </html>
