@@ -144,6 +144,7 @@ var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=
 				
 				else {
 					document.getElementById("meh").innerHTML = "Something went wrong and we're unable to display this file directly. However, you can still go to the <a href='https://newark.legistar.com/Legislation.aspx'>Legistar legislation search</a> and search directly by the File Number (#" + listFile + ") to see the resolution and associated materials if available.";
+					document.getElementById("documentviewer").style.display = none;
 				}
 					
 				
@@ -153,12 +154,14 @@ var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=
 		}
 		else {
 			document.getElementById("meh").innerHTML = "Oops, it looks like the relevant Legistar legislation (File #" + listFile + ") is still in review (not public/adopted). Sorry! We're still cleaning up some of this data - please bear with us.";
+			document.getElementById("documentviewer").style.display = none;
 		}
 			
 						
 		})
 		.fail(function () {
-			document.getElementById("meh").innerHTML = "Oops, it looks like the relevant Legistar legislation (File #" + listFile + ") is still in review (not public/adopted). Sorry! We're still cleaning up some of this data - please bear with us.";
+			document.getElementById("meh").innerHTML = "Something went wrong and we're unable to display this file directly. However, you can still go to the <a href='https://newark.legistar.com/Legislation.aspx'>Legistar legislation search</a> and search directly by the File Number (#" + listFile + ") to see the resolution and associated materials if available.";
+			document.getElementById("documentviewer").style.display = none;
 			} )
 
 		.always(function() {
