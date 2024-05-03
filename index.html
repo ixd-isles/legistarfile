@@ -116,6 +116,7 @@ var legiCall = encodeURI("https://webapi.legistar.com/v1/newark/matters?$filter=
 					
 					if (len === 0) {
 						document.getElementById("meh").innerHTML = "Because Legistar's API is annoying, a direct link to this document is not available. However, you can still find the text and details of the legislation by going to <b><a href='https://newark.legistar.com/Legislation.aspx'>newark.legistar.com/Legislation</a></b> and searching by the file number: #" + listFile;
+						document.getElementById("documentviewer").style.display = 'none';
 					}
 					
 					else {
