@@ -33,17 +33,26 @@
 <script>
 
 
-function isSimilar(str1, str2) {
-  return str1.indexOf(str2.toLowerCase()) !== -1;
+function isSimilar(attachmentName, searchPhrases) {
+   // Check for exact matches first
+  for (const phrase of searchPhrases) {
+    if (attachmentName.includes(phrase)) {
+      return true;
+    }
+  }
+
+  // Check for variations with "agreement"
+  const agreementRegex = /.*agreement.*/i;
+  return agreementRegex.test(attachmentName);
 }
 
 function findMatchingAttachment(recordtype, json) {
-  const searchPhrase = (recordtype === "TA") ? "Agreement" : "Agreement";
+  const searchPhrases = (recordtype === "TA") ? "financial agreement" : "redevelopment agreement";
 
   for (let i = 0; i < json.length; i++) {
     const attachmentName = json[i].MatterAttachmentName.toLowerCase(); // Ensure case-insensitive search
 
-    if (isSimilar(attachmentName, searchPhrase.toLowerCase())) {
+    if (isSimilar(attachmentName, searchPhrases)) {
       return json[i].MatterAttachmentHyperlink;
     }
   }
