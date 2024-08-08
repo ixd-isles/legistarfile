@@ -38,7 +38,7 @@ function isSimilar(str1, str2) {
 }
 
 function findMatchingAttachment(recordtype, json) {
-  const searchPhrase = (recordtype === "TA") ? "Financial Agreement" : "Redevelopment Agreement";
+  const searchPhrase = (recordtype === "TA") ? "Agreement" : "Agreement";
 
   for (let i = 0; i < json.length; i++) {
     const attachmentName = json[i].MatterAttachmentName.toLowerCase(); // Ensure case-insensitive search
